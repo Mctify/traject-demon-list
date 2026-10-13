@@ -3,1693 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traject Demon List - Pointercrate</title>
+    <title>Traject Demonlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Righteous&display=swap" rel="stylesheet">
     <style>
-        .righteous-regular, body, h1, h2, h3, h4, h5, h6, button, input, select {
-            font-family: "Righteous", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+        
         body {
-            background-color: #f8fafc;
-            color: #334155;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f6f9;
+            color: #4a4a4a;
+            overflow-x: hidden;
         }
-        .pointercrate-card {
-            background-color: #ffffff;
-            border: 1px dashed #cbd5e1;
-            border-radius: 4px;
-            transition: all 0.15s ease-in-out;
+
+        /* Custom Pixel/Cube Background Borders */
+        .side-decoration {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 140px;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 2px;
+            padding: 10px;
+            overflow: hidden;
         }
-        .pointercrate-card:hover {
-            border-color: #0891b2;
-            box-shadow: 0 4px 12px -2px rgba(8, 145, 178, 0.1);
+
+        .side-left {
+            left: 0;
         }
-        .pointercrate-nav-tabs {
-            border: 1px dashed #cbd5e1;
+
+        .side-right {
+            right: 0;
+        }
+
+        .bg-cube {
+            width: 28px;
+            height: 28px;
+            opacity: 0.85;
+            transition: transform 0.3s ease;
+        }
+
+        .c-blue-1 { background-color: #0070ba; }
+        .c-blue-2 { background-color: #005691; }
+        .c-blue-3 { background-color: #0088cc; }
+        .c-blue-4 { background-color: #00aaff; }
+        .c-blue-5 { background-color: #003d66; }
+
+        /* Pointercrate Card styling */
+        .pc-card {
             background: #ffffff;
             border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            border: 1px solid #e1e8ed;
         }
-        .modal-backdrop {
-            background-color: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(3px);
+
+        .nav-tab {
+            font-weight: 700;
+            color: #7f8c8d;
+            padding: 10px 20px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
+
+        .nav-tab.active {
+            color: #2c3e50;
+            border-bottom: 3px solid #0070ba;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .nav-tab:hover:not(.active) {
+            color: #34495e;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #0891b2;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0e7490;
+
+        /* Top Nav Header */
+        .header-shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] min-h-screen flex flex-col justify-between text-slate-800">
+<body class="min-h-screen relative">
 
-    <!-- Toast Notifications Container -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirm-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded pointercrate-card max-w-md w-full p-6 relative shadow-xl space-y-4">
-            <h3 id="confirm-modal-title" class="text-lg font-black text-slate-900 border-b pb-2">Confirm Action</h3>
-            <p id="confirm-modal-msg" class="text-xs text-slate-600 leading-relaxed"></p>
-            <div class="flex justify-end gap-3 pt-3">
-                <button onclick="closeConfirmModal(false)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded transition">Cancel</button>
-                <button id="confirm-modal-btn" onclick="closeConfirmModal(true)" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded shadow">Proceed</button>
-            </div>
-        </div>
+    <!-- Left Blue Pixel Border -->
+    <div class="side-decoration side-left hidden lg:flex" id="leftDecoration">
+        <script>
+            const colors = ['c-blue-1', 'c-blue-2', 'c-blue-3', 'c-blue-4', 'c-blue-5'];
+            for(let i=0; i<120; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                document.getElementById('leftDecoration')?.insertAdjacentHTML('beforeend', `<div class="bg-cube ${color}"></div>`);
+            }
+        </script>
     </div>
 
-    <!-- Level Info & Victors Modal -->
-    <div id="level-detail-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded pointercrate-card max-w-2xl w-full p-6 relative shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
-            <button onclick="closeLevelDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div id="level-detail-content"></div>
-        </div>
+    <!-- Right Blue Pixel Border -->
+    <div class="side-decoration side-right hidden lg:flex" id="rightDecoration">
+        <script>
+            for(let i=0; i<120; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                document.getElementById('rightDecoration')?.insertAdjacentHTML('beforeend', `<div class="bg-cube ${color}"></div>`);
+            }
+        </script>
     </div>
 
-    <!-- Top Pointercrate Header -->
-    <header class="bg-white border-b border-slate-200 py-3 px-4 sm:px-8 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <a href="javascript:void(0)" onclick="switchTab('main-list')" class="text-2xl font-black tracking-tight text-slate-800 hover:text-cyan-700 transition uppercase flex items-center">
-                    POINTERCRATE<span class="text-cyan-600 font-extrabold text-xs ml-0.5 tracking-normal lowercase">.com</span>
+    <!-- Main Navbar -->
+    <header class="bg-white header-shadow relative z-20">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" onclick="showListView()" class="font-extrabold text-xl tracking-tight text-slate-700 hover:text-blue-600 transition">
+                TRAJECT DEMONLIST<span class="text-blue-500 text-xs align-super">.COM</span>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center space-x-6 text-xs uppercase font-bold tracking-wider text-slate-600">
+                <a href="#" class="text-center hover:text-blue-600 transition">
+                    <span class="block text-[10px] text-slate-400 leading-none">REST API</span>
+                    Documentation
                 </a>
-            </div>
+                <a href="#" class="text-center hover:text-blue-600 transition">
+                    <span class="block text-[10px] text-slate-400 leading-none">POINTERCRATE</span>
+                    User Area
+                </a>
+                <a href="#" class="text-center text-blue-600 flex items-center gap-1">
+                    <div>
+                        <span class="block text-[10px] text-slate-400 leading-none">Geometry Dash</span>
+                        TRAJECT DEMONLIST
+                    </div>
+                    <i class="fa-solid fa-caret-down text-xs"></i>
+                </a>
+                <div class="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition">
+                    <span>EN</span>
+                    <i class="fa-solid fa-caret-down text-xs"></i>
+                </div>
+            </nav>
 
-            <div class="flex flex-wrap items-center justify-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-600">
-                <div class="text-center">
-                    <span class="block text-[9px] text-slate-400 font-normal tracking-normal uppercase">REST API</span>
-                    <a href="https://pointercrate.com/documentation/" target="_blank" class="hover:text-cyan-600 transition">Documentation</a>
-                </div>
-                <div class="text-center">
-                    <span class="block text-[9px] text-slate-400 font-normal tracking-normal uppercase">CLOUD SYNC</span>
-                    <span id="sync-status" class="text-emerald-600 font-black">CONNECTED</span>
-                </div>
-                <div class="text-center">
-                    <span class="block text-[9px] text-slate-400 font-normal tracking-normal uppercase">Geometry Dash</span>
-                    <button onclick="switchTab('main-list')" class="hover:text-cyan-600 transition flex items-center gap-1">
-                        DEMONLIST <i class="fa-solid fa-caret-down text-[10px]"></i>
-                    </button>
-                </div>
-
-                <button id="editor-panel-btn" onclick="switchTab('editor-panel')" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-lock text-cyan-400"></i>
-                    <span>Editor Panel</span>
-                    <span id="inbox-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black">0</span>
-                </button>
-
-                <div id="auth-header-container">
-                    <button onclick="openAuthModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition flex items-center gap-2 shadow-xs">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                        <span>Log In</span>
-                    </button>
-                </div>
-            </div>
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-slate-600 text-xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full space-y-6">
-
-        <div class="pointercrate-nav-tabs p-2 flex justify-center items-center gap-4 sm:gap-12 text-sm font-bold text-slate-700 shadow-xs flex-wrap">
-            <button onclick="switchTab('main-list')" id="top-tab-main" class="hover:text-cyan-600 transition pb-0.5 border-b-2 border-cyan-600 text-slate-900">
-                Main List
-            </button>
-            <button onclick="switchTab('extended-list')" id="top-tab-extended" class="hover:text-cyan-600 transition text-slate-600">
-                Extended List
-            </button>
-            <button onclick="switchTab('stats-viewer')" id="top-tab-stats" class="hover:text-cyan-600 transition text-slate-600">
-                Stats Viewer
-            </button>
-            <button onclick="switchTab('leaderboard-viewer')" id="top-tab-leaderboard" class="hover:text-cyan-600 transition text-slate-600 flex items-center gap-1.5">
-                <i class="fa-solid fa-ranking-star text-cyan-600"></i> Leaderboard Matrix
-            </button>
-            <button onclick="openSubmitRecordModal()" class="hover:text-cyan-600 transition text-cyan-600 font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-paper-plane text-xs"></i> Submit Record
-            </button>
+    <main class="max-w-5xl mx-auto px-4 py-6 relative z-20">
+        
+        <!-- List Tabs Navigation Bar -->
+        <div class="pc-card mb-6 flex items-center justify-around text-xs md:text-sm border-b">
+            <button class="nav-tab active flex-1 text-center py-3">Main List</button>
         </div>
 
-        <!-- VIEW 1: MAIN LIST -->
-        <section id="view-main-list" class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div id="main-levels-list-container" class="lg:col-span-2 space-y-4">
-                    <div class="text-center py-12 text-slate-400 font-medium">
-                        <p>Loading demons...</p>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="pointercrate-card p-6 text-center space-y-4">
-                        <h3 class="text-xl font-bold text-slate-800 tracking-tight">List Editors</h3>
-                        <p class="text-xs text-slate-500 leading-relaxed px-2">
-                            Contact the list editor if you have problems with the list or want to see a specific thing changed.
-                        </p>
-                        <div class="pt-2 space-y-3 text-xs font-bold text-slate-700">
-                            <div class="text-sm font-black text-slate-900 flex items-center justify-center gap-1.5">
-                                <span class="text-cyan-700 font-black">7r4ject0ry</span>
+        <!-- Grid Layout: Main Content Left, Sidebars Right -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column: Level Content -->
+            <div class="lg:col-span-2 space-y-4">
+                
+                <!-- View 1: Level List Items -->
+                <div id="listView" class="space-y-4">
+                    <!-- #1 Cloudy Haze Card -->
+                    <div onclick="showDetailView('cloudyHaze')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
+                            <img src="https://img.youtube.com/vi/u66qmaYVBW8/hqdefault.jpg" alt="Cloudy Haze Thumbnail" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl"></i>
                             </div>
                         </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-xl font-bold text-slate-800">
+                                #1 – cloudy haze
+                            </h2>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">
+                                published by <span class="text-slate-800 font-bold">extrahotsauce</span>
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                verified by <span class="text-slate-700 font-medium">extrahotsauce</span>
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="pointercrate-card p-4 text-xs space-y-2 text-slate-600">
-                        <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                            <span class="font-semibold">Main List Demons (#1-#100):</span>
-                            <span id="stat-main-demons" class="font-bold text-cyan-700">0</span>
+                    <!-- #2 Valtuhed Clubstwp Card -->
+                    <div onclick="showDetailView('valtuhedClubstwp')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
+                            <img src="https://img.youtube.com/vi/4-CdAOrmUWQ/hqdefault.jpg" alt="Valtuhed Clubstwp Thumbnail" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                            </div>
                         </div>
-                        <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                            <span class="font-semibold">Extended List (#101-#130):</span>
-                            <span id="stat-extended-demons" class="font-bold text-cyan-700">0</span>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-xl font-bold text-slate-800">
+                                #2 – Valtuhed Clubstwp
+                            </h2>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">
+                                published by <span class="text-slate-800 font-bold">7r4ject0ry</span>
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                verified by <span class="text-slate-700 font-medium">7r4ject0ry</span>
+                            </p>
                         </div>
-                        <div class="flex justify-between border-b border-slate-100 pb-1.5">
-                            <span class="font-semibold">Registered Players:</span>
-                            <span id="stat-total-players" class="font-bold text-slate-900">0</span>
+                    </div>
+
+                    <!-- #3 Artificial Mixed Card -->
+                    <div onclick="showDetailView('artificialMixed')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
+                            <img src="https://img.youtube.com/vi/fa6oMGz3h6o/hqdefault.jpg" alt="Artificial Mixed Thumbnail" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                            </div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="font-semibold">Pending Submissions:</span>
-                            <span id="stat-pending-records" class="font-bold text-cyan-700">0</span>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-xl font-bold text-slate-800">
+                                #3 – Artificial Mixed
+                            </h2>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">
+                                published by <span class="text-slate-800 font-bold">7r4ject0ry</span>
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                verified by <span class="text-slate-700 font-medium">7r4ject0ry</span>
+                            </p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- VIEW 2: EXTENDED LIST -->
-        <section id="view-extended-list" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div id="extended-levels-list-container" class="lg:col-span-2 space-y-4">
-                    <div class="text-center py-12 text-slate-400 font-medium">
-                        <p>No extended list demons added yet.</p>
-                    </div>
-                </div>
+                <!-- View 2: Detailed Level View -->
+                <div id="detailView" class="hidden space-y-4">
+                    <!-- Main Level Card Details -->
+                    <div class="pc-card p-6 text-center">
+                        <button onclick="showListView()" class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-2 hover:underline inline-flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-left"></i> Back to list
+                        </button>
 
-                <div class="space-y-6">
-                    <div class="pointercrate-card p-5 text-xs space-y-2 text-slate-600">
-                        <h3 class="font-bold text-sm text-slate-900 border-b pb-2">Extended List Rules</h3>
-                        <p class="leading-relaxed text-slate-500">
-                            The Extended List holds levels ranked from <strong>#101 to #130</strong>.
-                            If a level is pushed beyond <strong>#130</strong>, it is permanently erased from the Demonlist!
+                        <h1 id="detailTitle" class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center justify-center gap-2 uppercase">
+                            CLOUDY HAZE <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-400 text-xl hover:text-slate-600"></i></a>
+                        </h1>
+                        <p id="detailCreators" class="text-xs text-slate-600 mt-2">
+                            by <span class="underline font-medium">extrahotsauce</span>, 
+                            published by <span class="font-bold">extrahotsauce</span>, 
+                            verified by <span class="font-bold">extrahotsauce</span>
                         </p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        <p id="detailDesc" class="text-xs italic text-slate-400 mt-1">"yeah ok this my level wow"</p>
 
-        <!-- VIEW 3: STATS VIEWER -->
-        <section id="view-stats-viewer" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="pointercrate-card p-4 space-y-3">
-                    <div class="relative">
-                        <input type="text" id="player-search" oninput="filterPlayers()" placeholder="Search players..." class="w-full pl-8 pr-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 outline-none">
-                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-slate-400 text-xs"></i>
-                    </div>
-
-                    <div id="stats-players-list" class="max-h-[500px] overflow-y-auto divide-y divide-slate-100 pr-1">
-                        <div class="text-center py-8 text-slate-400 text-xs">No registered players yet.</div>
-                    </div>
-                </div>
-
-                <div id="player-details-container" class="lg:col-span-2 pointercrate-card p-6 min-h-[350px] flex flex-col justify-center items-center text-center">
-                    <i class="fa-solid fa-trophy text-4xl text-cyan-200 mb-3"></i>
-                    <h3 class="text-lg font-bold text-slate-700">Select a Player</h3>
-                    <p class="text-xs text-slate-500 max-w-sm mt-1">Click on any player from the leaderboard to view their completed demons.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- VIEW 4: DETAILED LEADERBOARD MATRIX -->
-        <section id="view-leaderboard-viewer" class="hidden space-y-6">
-            <div class="pointercrate-card p-6 space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-xl font-black text-slate-900 tracking-tight">Leaderboard Matrix & Analytics</h2>
-                        <p class="text-xs text-slate-500">Live updated scores, rank standings, and demon completion statistics</p>
-                    </div>
-                    <div id="leaderboard-total-count" class="text-xs font-bold bg-cyan-50 text-cyan-800 px-3 py-1 rounded border border-cyan-200">
-                        Total Competitors: 0
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs text-left">
-                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b">
-                            <tr>
-                                <th class="p-3">Rank</th>
-                                <th class="p-3">Player</th>
-                                <th class="p-3 text-center">Main List Completed</th>
-                                <th class="p-3 text-center">Extended Completed</th>
-                                <th class="p-3 text-right">Demon Points</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-table-body" class="divide-y divide-slate-100">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- VIEW 5: EDITOR PANEL -->
-        <section id="view-editor-panel" class="hidden space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <div>
-                    <h1 class="text-xl font-black text-slate-900 tracking-tight">List Editor Management Panel</h1>
-                    <p class="text-xs text-cyan-700 font-bold">Authorized Editor: 7r4ject0ry</p>
-                </div>
-            </div>
-
-            <div class="flex border-b border-slate-200 text-sm font-bold gap-4">
-                <button onclick="switchEditorTab('submissions')" id="tab-btn-submissions" class="pb-2 border-b-2 border-cyan-600 text-cyan-600">
-                    Record Submissions Inbox (<span id="editor-inbox-count">0</span>)
-                </button>
-                <button onclick="switchEditorTab('levels')" id="tab-btn-levels" class="pb-2 text-slate-500 hover:text-slate-900">
-                    Manage & Reorder Levels
-                </button>
-                <button onclick="switchEditorTab('players')" id="tab-btn-players" class="pb-2 text-slate-500 hover:text-slate-900">
-                    Manage Registered Players
-                </button>
-            </div>
-
-            <div id="editor-tab-submissions" class="space-y-4">
-                <div id="submissions-inbox-list" class="space-y-4">
-                    <div class="text-center py-10 text-slate-400 text-sm">No pending record submissions.</div>
-                </div>
-            </div>
-
-            <div id="editor-tab-levels" class="hidden space-y-6">
-                <div class="pointercrate-card p-5 space-y-4">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="text-base font-bold text-slate-900"><i class="fa-solid fa-plus-circle text-cyan-600 mr-2"></i>Add New Demon</h3>
-                        <span class="text-xs bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded border border-slate-200">Custom Position Placement</span>
-                    </div>
-                    <form id="add-level-form" onsubmit="handleAddLevel(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Level Name *</label>
-                            <input type="text" id="new-level-name" required placeholder="Grief" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
+                        <!-- Video Container -->
+                        <div class="mt-4 rounded overflow-hidden aspect-video bg-black relative max-w-2xl mx-auto shadow">
+                            <iframe id="detailIframe" class="w-full h-full" src="https://www.youtube.com/embed/u66qmaYVBW8" title="Level Verification Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Publisher *</label>
-                            <input type="text" id="new-level-publisher" required placeholder="icedcave" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Creator *</label>
-                            <input type="text" id="new-level-creator" required placeholder="icedcave & more" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Verifier *</label>
-                            <input type="text" id="new-level-verifier" required placeholder="Zoink" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Level ID *</label>
-                            <input type="text" id="new-level-id" required placeholder="84920183" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">YouTube Video Link *</label>
-                            <input type="url" id="new-level-yt" required placeholder="https://youtube.com/watch?v=..." class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Placement Rank (#) *</label>
-                            <input type="number" id="new-level-position" min="1" value="1" required placeholder="e.g. 1" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div class="sm:col-span-2 md:col-span-3 flex justify-end">
-                            <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs px-5 py-2.5 rounded shadow-xs">
-                                Add Demon Level
-                            </button>
-                        </div>
-                    </form>
-                </div>
 
-                <div class="pointercrate-card p-5 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">Rearrange & Manage Demon Placement</h3>
-                            <p class="text-xs text-slate-500">Move levels up or down or remove them completely from the list.</p>
+                        <!-- Level Metadata Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6 pt-4 border-t text-center text-xs justify-center">
+                            <div>
+                                <div class="text-slate-500 font-medium text-[11px]">Level Password</div>
+                                <div id="detailPassword" class="font-bold text-slate-700 mt-0.5">Free Copy</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 font-medium text-[11px]">Level ID</div>
+                                <div id="detailLevelId" class="font-bold text-slate-700 mt-0.5">144366482</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 font-medium text-[11px]">Object Count</div>
+                                <div id="detailObjects" class="font-bold text-slate-700 mt-0.5">--</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-xs">
+                            <div class="text-slate-500 font-medium text-[11px]">Created In</div>
+                            <div class="font-bold text-slate-700 mt-0.5">2.2</div>
                         </div>
                     </div>
-                    <div id="editor-levels-reorder-list" class="space-y-2"></div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="space-y-6">
+                <!-- List Editors Card -->
+                <div class="pc-card p-5 text-center">
+                    <h3 class="font-bold text-slate-700 text-base mb-3">List Editors</h3>
+                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Contact any of these people if you have problems with the list or want to see a specific thing changed.
+                    </p>
+                    <div class="text-xs font-bold text-slate-600 space-y-2 uppercase tracking-wide">
+                        <div>7r4ject0ry</div>
+                    </div>
+                </div>
+
+                <!-- Guidelines Card -->
+                <div class="pc-card p-5 text-center">
+                    <h3 class="font-bold text-slate-700 text-base mb-3">Guidelines</h3>
+                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                        All demonlist operations are carried out in accordance to our guidelines. Be sure to check them before submitting a record to ensure a flawless experience!
+                    </p>
+                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded transition shadow-sm">
+                        Read the guidelines!
+                    </button>
                 </div>
             </div>
 
-            <div id="editor-tab-players" class="hidden space-y-4">
-                <div class="pointercrate-card p-5 space-y-4 bg-cyan-50/40 border-cyan-200">
-                    <h3 class="text-base font-bold text-slate-900 border-b border-cyan-200 pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles text-cyan-600"></i> Editor Custom Point Modifier
-                    </h3>
-                    <p class="text-xs text-slate-600">As list editor (7r4ject0ry), you can award or adjust bonus points directly to any player (including yourself).</p>
-                    <form onsubmit="handleManualPointAdjustment(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Select Player *</label>
-                            <select id="point-adj-player" required class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                                <option value="">-- Choose Player --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Bonus Points (+ / -) *</label>
-                            <input type="number" step="0.1" id="point-adj-amount" required placeholder="e.g. 100 or -50" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        </div>
-                        <div>
-                            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs py-2 rounded transition shadow-xs">
-                                Update Player Points
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="pointercrate-card p-5 space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 border-b pb-2"><i class="fa-solid fa-users-slash text-red-600 mr-2"></i>Remove Registered Players</h3>
-                    <div id="editor-players-manage-list" class="space-y-2 divide-y divide-slate-100"></div>
-                </div>
-            </div>
-        </section>
-
+        </div>
     </main>
 
-    <!-- Sign In / Sign Up Modal -->
-    <div id="auth-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded pointercrate-card max-w-md w-full p-6 relative shadow-2xl space-y-5">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="text-center border-b border-slate-200 pb-3">
-                <h2 id="auth-title" class="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
-                <p class="text-xs text-slate-500 mt-1">Access your Traject Demon List synced account</p>
-            </div>
-
-            <!-- Mode Switcher Tabs -->
-            <div class="flex border-b border-slate-200 text-xs font-bold text-center">
-                <button id="auth-tab-signin" onclick="setAuthMode('signin')" class="w-1/2 pb-2 border-b-2 border-cyan-600 text-cyan-600">Sign In</button>
-                <button id="auth-tab-signup" onclick="setAuthMode('signup')" class="w-1/2 pb-2 text-slate-500 hover:text-slate-900">Create Account</button>
-            </div>
-
-            <!-- Google Sign In Button -->
-            <button onclick="handleGoogleSignIn()" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs py-2.5 rounded transition shadow-xs flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                <span id="google-auth-text">Continue with Google</span>
-            </button>
-
-            <!-- Container for Sign In Form (Hidden on Sign Up Mode) -->
-            <div id="email-auth-section" class="space-y-4">
-                <div class="relative flex py-1 items-center">
-                    <div class="flex-grow border-t border-slate-200"></div>
-                    <span class="flex-shrink mx-2 text-[10px] text-slate-400 font-bold uppercase">Or with Username / Password</span>
-                    <div class="flex-grow border-t border-slate-200"></div>
-                </div>
-
-                <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Username *</label>
-                        <input type="text" id="auth-identifier" placeholder="Enter username" class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
-                        <input type="password" id="auth-password" placeholder="••••••••" class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                    </div>
-
-                    <button type="submit" id="auth-submit-btn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs py-2.5 rounded transition shadow-xs">
-                        Sign In
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Account Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded pointercrate-card max-w-md w-full p-6 relative shadow-2xl space-y-5">
-            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="text-center border-b border-slate-200 pb-3">
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Account Manager</h2>
-                <p class="text-xs text-slate-500 mt-1">Manage profile avatar and credentials</p>
-            </div>
-
-            <div class="flex flex-col items-center justify-center space-y-2">
-                <div id="profile-avatar-preview" class="w-16 h-16 rounded-full border border-slate-300 flex items-center justify-center overflow-hidden bg-slate-100 text-slate-500 text-2xl shadow-inner">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase">Avatar Preview</span>
-            </div>
-
-            <form onsubmit="handleSaveProfile(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Display Username</label>
-                    <input type="text" id="profile-username" required class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Avatar Image URL (Optional)</label>
-                    <input type="url" id="profile-avatar" oninput="updateProfileAvatarPreview()" placeholder="https://..." class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Default Avatar Theme</label>
-                    <select id="profile-avatar-color" onchange="updateProfileAvatarPreview()" class="w-full p-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        <option value="cyan">Pointercrate Cyan</option>
-                        <option value="gray">Neutral Gray / White</option>
-                        <option value="blue">Blue Sky</option>
-                        <option value="purple">Royal Purple</option>
-                        <option value="dark">Stealth Dark</option>
-                    </select>
-                </div>
-
-                <div class="border-t pt-3 space-y-2">
-                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-bell text-cyan-600"></i> Notifications Inbox
-                    </h4>
-                    <div id="user-notifications-list" class="max-h-36 overflow-y-auto space-y-2 text-xs"></div>
-                </div>
-
-                <div class="flex justify-between items-center pt-3 border-t">
-                    <button type="button" onclick="handleLogout()" class="text-xs text-red-600 font-bold hover:underline">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Log Out
-                    </button>
-                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs px-5 py-2.5 rounded shadow-xs">
-                        Save Changes
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Submit Record Modal -->
-    <div id="submit-record-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded pointercrate-card max-w-md w-full p-6 relative shadow-2xl space-y-5">
-            <button onclick="closeSubmitRecordModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="text-center border-b border-slate-200 pb-3">
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Submit Demon Record</h2>
-                <p class="text-xs text-slate-500 mt-1">Submit completion proof for verification</p>
-            </div>
-
-            <form onsubmit="handleSubmitRecord(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Submitting As</label>
-                    <div id="submit-player-display" class="p-2.5 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-800 flex items-center gap-2"></div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Select Demon Level *</label>
-                    <select id="submit-level-id" required class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                        <option value="">-- Choose Level --</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Completion Video Link *</label>
-                    <input type="url" id="submit-video-url" required placeholder="https://youtube.com/watch?v=..." class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Progress / Notes</label>
-                    <input type="text" id="submit-notes" placeholder="100% completion, raw video link" class="w-full p-2.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-cyan-500 outline-none">
-                </div>
-
-                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs py-2.5 rounded transition shadow-xs">
-                    Submit Record
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto space-y-2">
-        <p>&copy; 2026 Traject Demon list. Pointercrate Layout Theme with Live Server Sync.</p>
-        <div class="flex justify-center items-center gap-4 font-semibold text-slate-600">
-            <a href="https://discord.gg/jX6psVPwB2" target="_blank" rel="noopener noreferrer" class="hover:text-[#5865F2] transition flex items-center gap-1">
-                <i class="fa-brands fa-discord text-sm text-[#5865F2]"></i> Join Discord Server
-            </a>
-        </div>
-    </footer>
-
-    <!-- Firebase JS SDK Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'traject-demon-list';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-           apiKey: "AIzaSyDxVc74dIeuz-9qyxZzYpbiiAp3aQlqEuI",
-           authDomain: "traject-demonlist.firebaseapp.com",
-           projectId: "traject-demonlist",
-           storageBucket: "traject-demonlist.firebasestorage.app",
-           messagingSenderId: "613306062014",
-           appId: "1:613306062014:web:1428b953771d65e13abaef",
-           measurementId: "G-KV3QFD73HY"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Firestore Paths (Strict Rule 1)
-        const levelsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'levels');
-        const playersCollection = collection(db, 'artifacts', appId, 'public', 'data', 'players');
-        const submissionsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
-        const accountsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'user_accounts');
-
-        window.firebaseDB = db;
-        window.firebaseAuth = auth;
-        window.appId = appId;
-        window.authMode = 'signin'; // 'signin' or 'signup'
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch(err) {
-                console.warn("Auth initialization fallback:", err);
-            }
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Subscribe to Realtime Firestore Collections
-                setupRealtimeSync();
-            }
-        });
-
-        function setupRealtimeSync() {
-            // Sync Levels
-            onSnapshot(levelsCollection, (snapshot) => {
-                const levels = [];
-                snapshot.forEach(docSnap => levels.push({ id: docSnap.id, ...docSnap.data() }));
-                levels.sort((a,b) => a.position - b.position);
-                window.allLevels = levels;
-                window.renderMainAndExtendedLists();
-                window.renderEditorLevelsReorder();
-                window.renderLevelSelectDropdown();
-                window.renderLeaderboardMatrix();
-            }, (err) => console.error("Levels sync error:", err));
-
-            // Sync Players
-            onSnapshot(playersCollection, (snapshot) => {
-                const players = [];
-                snapshot.forEach(docSnap => players.push({ uid: docSnap.id, ...docSnap.data() }));
-                window.allPlayers = players;
-                window.renderStatsViewer();
-                window.renderEditorPlayersManage();
-                window.renderLeaderboardMatrix();
-            }, (err) => console.error("Players sync error:", err));
-
-            // Sync Submissions
-            onSnapshot(submissionsCollection, (snapshot) => {
-                const submissions = [];
-                snapshot.forEach(docSnap => submissions.push({ id: docSnap.id, ...docSnap.data() }));
-                window.allSubmissions = submissions;
-                window.renderSubmissionsInbox();
-            }, (err) => console.error("Submissions sync error:", err));
-        }
-
-        window.handleGoogleSignIn = async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                const result = await signInWithPopup(auth, provider);
-                const googleUser = result.user;
-
-                const displayName = googleUser.displayName || googleUser.email.split('@')[0];
-                const email = googleUser.email;
-
-                // Sync account to Firestore Database
-                const accountRef = doc(db, 'artifacts', appId, 'public', 'data', 'user_accounts', googleUser.uid);
-                const accountSnap = await getDoc(accountRef);
-
-                let isEditor = (email === 'sarun.sky.07@gmail.com' || displayName.toLowerCase() === '7r4ject0ry');
-
-                const accountData = {
-                    uid: googleUser.uid,
-                    username: isEditor ? '7r4ject0ry' : displayName,
-                    email: email,
-                    role: isEditor ? 'owner' : 'player',
-                    avatar: googleUser.photoURL || '',
-                    avatarColor: 'cyan',
-                    notifications: accountSnap.exists() ? (accountSnap.data().notifications || []) : []
-                };
-
-                await setDoc(accountRef, accountData, { merge: true });
-
-                // Also ensure player entry exists
-                const playerRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', googleUser.uid);
-                const playerSnap = await getDoc(playerRef);
-                if (!playerSnap.exists()) {
-                    await setDoc(playerRef, {
-                        uid: googleUser.uid,
-                        username: accountData.username,
-                        email: email,
-                        role: accountData.role,
-                        avatar: accountData.avatar,
-                        avatarColor: 'cyan',
-                        completedDemons: [],
-                        notifications: []
-                    });
-                }
-
-                window.currentUserData = accountData;
-                localStorage.setItem('traject_user_session', JSON.stringify(accountData));
-
-                window.updateAuthUI();
-                window.closeAuthModal();
-                window.showToast(`Signed in as ${accountData.username}!`, "success");
-            } catch (err) {
-                console.error("Google Sign In Error:", err);
-                if (err.code === 'auth/unauthorized-domain') {
-                    // Fallback sign-in when iframe domain is not authorized in Firebase Console
-                    const fallbackName = prompt("Google Auth is restricted on this domain preview. Enter a username to sign in instead:", "GoogleUser");
-                    if (fallbackName && fallbackName.trim() !== "") {
-                        const guestUid = 'usr_g_' + Date.now();
-                        const isEditor = fallbackName.trim().toLowerCase() === '7r4ject0ry' || fallbackName.trim().toLowerCase() === 'sarun.sky.07@gmail.com';
-                        const accountData = {
-                            uid: guestUid,
-                            username: isEditor ? '7r4ject0ry' : fallbackName.trim(),
-                            email: `${fallbackName.trim().toLowerCase()}@gmail.com`,
-                            role: isEditor ? 'owner' : 'player',
-                            avatar: '',
-                            avatarColor: 'cyan',
-                            notifications: []
-                        };
-                        const accountRef = doc(db, 'artifacts', appId, 'public', 'data', 'user_accounts', guestUid);
-                        await setDoc(accountRef, accountData, { merge: true });
-                        
-                        const playerRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', guestUid);
-                        await setDoc(playerRef, {
-                            uid: guestUid,
-                            username: accountData.username,
-                            role: accountData.role,
-                            avatar: '',
-                            avatarColor: 'cyan',
-                            completedDemons: [],
-                            notifications: []
-                        }, { merge: true });
-
-                        window.currentUserData = accountData;
-                        localStorage.setItem('traject_user_session', JSON.stringify(accountData));
-                        window.updateAuthUI();
-                        window.closeAuthModal();
-                        window.showToast(`Logged in as ${accountData.username}!`, "success");
-                    }
-                } else {
-                    window.showToast("Google Sign-In failed or was cancelled.", "error");
-                }
-            }
-        };
-
-        window.handleAuthSubmit = async (e) => {
-            e.preventDefault();
-            const identifier = document.getElementById('auth-identifier').value.trim();
-            const password = document.getElementById('auth-password').value;
-
-            if (!identifier) {
-                window.showToast("Please enter a username!", "error");
-                return;
-            }
-
-            const querySnap = await getDocs(accountsCollection);
-            let foundDoc = null;
-            querySnap.forEach(d => {
-                const data = d.data();
-                if (data.username && data.username.toLowerCase() === identifier.toLowerCase()) {
-                    foundDoc = { id: d.id, ...data };
-                }
-            });
-
-            // Is trying to log into hardcoded Editor account
-            const isEditor = (identifier.toLowerCase() === 'sarun.sky.07@gmail.com' || identifier.toLowerCase() === '7r4ject0ry');
-
-            if (window.authMode === 'signin') {
-                if (isEditor) {
-                    if (password !== 'dewdew100627') {
-                        window.showToast("Incorrect password for list editor account!", "error");
-                        return;
-                    }
-                    const editorUser = {
-                        uid: 'editor_7r4ject0ry',
-                        username: '7r4ject0ry',
-                        email: 'sarun.sky.07@gmail.com',
-                        role: 'owner',
-                        avatar: '',
-                        avatarColor: 'cyan',
-                        notifications: []
-                    };
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'user_accounts', 'editor_7r4ject0ry'), editorUser, { merge: true });
-                    window.currentUserData = editorUser;
-                    localStorage.setItem('traject_user_session', JSON.stringify(editorUser));
-                    window.updateAuthUI();
-                    window.closeAuthModal();
-                    window.showToast("Logged in as List Editor!", "success");
-                    return;
-                }
-
-                // Check Database for username
-                if (!foundDoc) {
-                    window.showToast("Account not found in database! Please create an account.", "error");
-                    return;
-                }
-
-                if (foundDoc.password !== password) {
-                    window.showToast("Incorrect password!", "error");
-                    return;
-                }
-
-                window.currentUserData = foundDoc;
-                localStorage.setItem('traject_user_session', JSON.stringify(foundDoc));
-                window.updateAuthUI();
-                window.closeAuthModal();
-                window.showToast(`Welcome back, ${foundDoc.username}!`, "success");
-
-            } else {
-                // SIGN UP MODE
-                if (foundDoc && !isEditor) {
-                    window.showToast("Username already exists in database! Please sign in.", "error");
-                    return;
-                }
-
-                const newUid = 'usr_' + Date.now();
-                const newUser = {
-                    uid: newUid,
-                    username: isEditor ? '7r4ject0ry' : identifier,
-                    password: password,
-                    role: isEditor ? 'owner' : 'player',
-                    avatar: '',
-                    avatarColor: 'cyan',
-                    notifications: []
-                };
-
-                // Save to user_accounts database
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'user_accounts', newUid), newUser);
-
-                // Save to players database
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', newUid), {
-                    uid: newUid,
-                    username: newUser.username,
-                    role: newUser.role,
-                    avatar: '',
-                    avatarColor: 'cyan',
-                    completedDemons: [],
-                    notifications: []
-                });
-
-                window.currentUserData = newUser;
-                localStorage.setItem('traject_user_session', JSON.stringify(newUser));
-                window.updateAuthUI();
-                window.closeAuthModal();
-                window.showToast(`Account created and registered successfully!`, "success");
-            }
-        };
-
-        // Initialize Firebase Auth
-        initAuth();
-    </script>
-
     <script>
-        window.allLevels = [];
-        window.allPlayers = [];
-        window.allSubmissions = [];
-        window.currentUserData = null;
-
-        // Gray placeholder image for deleted videos / missing thumbnails
-        window.GRAY_PLACEHOLDER = "https://placehold.co/640x360/e2e8f0/64748b?text=No+Thumbnail+Available";
-
-        window.calculateLevelPoints = (pos) => {
-            if (pos > 150) return 0;
-            return Math.max(0, 500 * Math.pow(0.96, pos - 1));
-        };
-
-        window.getYouTubeThumbnail = (url) => {
-            if (!url) return window.GRAY_PLACEHOLDER;
-            
-            let videoId = null;
-            // Enhanced regex for youtube standard, short links, embeds, and raw IDs
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-
-            if (match && match[2].length === 11) {
-                videoId = match[2];
-            } else if (url.trim().length === 11) {
-                videoId = url.trim();
-            }
-
-            if (!videoId) return window.GRAY_PLACEHOLDER;
-            return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        };
-
-        window.showToast = (msg, type = "info") => {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            const bgClass = type === 'success' ? 'bg-cyan-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
-            toast.className = `${bgClass} text-white px-4 py-3 rounded shadow-lg text-xs font-bold flex items-center justify-between gap-3 transform transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto`;
-            toast.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" class="text-white hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('opacity-0', 'translate-y-2'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        };
-
-        let confirmCallback = null;
-        window.showConfirmDialog = (title, message) => {
-            return new Promise((resolve) => {
-                document.getElementById('confirm-modal-title').innerText = title;
-                document.getElementById('confirm-modal-msg').innerText = message;
-                document.getElementById('confirm-modal').classList.remove('hidden');
-                confirmCallback = resolve;
-            });
-        };
-
-        window.closeConfirmModal = (result) => {
-            document.getElementById('confirm-modal').classList.add('hidden');
-            if (confirmCallback) confirmCallback(result);
-            confirmCallback = null;
-        };
-
-        window.setAuthMode = (mode) => {
-            window.authMode = mode;
-            const tabSignin = document.getElementById('auth-tab-signin');
-            const tabSignup = document.getElementById('auth-tab-signup');
-            const emailAuthSection = document.getElementById('email-auth-section');
-            const googleAuthText = document.getElementById('google-auth-text');
-
-            if (mode === 'signin') {
-                tabSignin.className = "w-1/2 pb-2 border-b-2 border-cyan-600 text-cyan-600 font-bold";
-                tabSignup.className = "w-1/2 pb-2 text-slate-500 hover:text-slate-900 font-bold";
-                document.getElementById('auth-title').innerText = "Sign In";
-                if (googleAuthText) googleAuthText.innerText = "Continue with Google";
-                if (emailAuthSection) emailAuthSection.classList.remove('hidden');
-            } else {
-                tabSignup.className = "w-1/2 pb-2 border-b-2 border-cyan-600 text-cyan-600 font-bold";
-                tabSignin.className = "w-1/2 pb-2 text-slate-500 hover:text-slate-900 font-bold";
-                document.getElementById('auth-title').innerText = "Create Account";
-                if (googleAuthText) googleAuthText.innerText = "Sign Up with Google";
-                if (emailAuthSection) emailAuthSection.classList.add('hidden');
+        const levelData = {
+            cloudyHaze: {
+                title: "CLOUDY HAZE",
+                creator: "extrahotsauce",
+                publisher: "extrahotsauce",
+                verifier: "extrahotsauce",
+                desc: '"yeah ok this my level wow"',
+                videoId: "u66qmaYVBW8",
+                password: "Free Copy",
+                id: "144366482",
+                objects: "N/A"
+            },
+            valtuhedClubstwp: {
+                title: "VALTUHED CLUBSTWP",
+                creator: "7r4ject0ry",
+                publisher: "7r4ject0ry",
+                verifier: "7r4ject0ry",
+                desc: '"Valtuhed Clubstwp Level Description"',
+                videoId: "4-CdAOrmUWQ",
+                password: "Free Copy",
+                id: "149766804",
+                objects: "N/A"
+            },
+            artificialMixed: {
+                title: "ARTIFICIAL MIXED",
+                creator: "7r4ject0ry",
+                publisher: "7r4ject0ry",
+                verifier: "7r4ject0ry",
+                desc: '"Artificial Mixed Level Description"',
+                videoId: "fa6oMGz3h6o",
+                password: "Free Copy",
+                id: "150213588",
+                objects: "N/A"
             }
         };
 
-        window.openLevelDetailModal = (levelId) => {
-            const lvl = window.allLevels.find(l => l.id === levelId);
-            if (!lvl) return;
-
-            const modal = document.getElementById('level-detail-modal');
-            const content = document.getElementById('level-detail-content');
-            
-            const victors = window.allPlayers.filter(p => 
-                (p.completedDemons || []).some(c => c.levelName.toLowerCase() === lvl.name.toLowerCase())
-            );
-
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <div class="border-b pb-3">
-                        <span class="text-xs font-bold text-cyan-600 uppercase tracking-wider">Demon Level Detail</span>
-                        <h2 class="text-2xl font-black text-slate-900">#${lvl.position} - ${lvl.name}</h2>
-                        <p class="text-xs text-slate-500 mt-1">Publisher: <span class="font-bold text-slate-800">${lvl.publisher}</span> | Creator: <span class="font-bold text-slate-800">${lvl.creator}</span> | Verifier: <span class="font-bold text-slate-800">${lvl.verifier}</span></p>
-                    </div>
-
-                    <div class="aspect-video w-full rounded overflow-hidden bg-black shadow-inner">
-                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/${lvl.videoUrl.split('v=')[1] || 'dQw4w9WgXcQ'}" frameborder="0" allowfullscreen></iframe>
-                    </div>
-
-                    <div class="space-y-2 pt-2">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Recorded Victors (${victors.length})</h4>
-                        ${victors.length === 0 ? `<p class="text-xs text-slate-400 italic">No victors recorded for this level yet.</p>` : `
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                ${victors.map(v => `
-                                    <div class="p-2 bg-slate-50 border border-slate-200 rounded flex items-center gap-2 text-xs">
-                                        <i class="fa-solid fa-trophy text-amber-500"></i>
-                                        <span class="font-bold text-slate-800">${v.username}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        `}
-                    </div>
-                </div>
-            `;
-
-            modal.classList.remove('hidden');
-        };
-
-        window.closeLevelDetailModal = () => document.getElementById('level-detail-modal')?.classList.add('hidden');
-
-        window.switchEditorTab = (tab) => {
-            ['submissions', 'levels', 'players'].forEach(t => {
-                const el = document.getElementById(`editor-tab-${t}`);
-                const btn = document.getElementById(`tab-btn-${t}`);
-                if (el) {
-                    if (t === tab) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-                if (btn) {
-                    if (t === tab) btn.className = "pb-2 border-b-2 border-cyan-600 text-cyan-600 font-bold";
-                    else btn.className = "pb-2 text-slate-500 hover:text-slate-900 font-bold";
-                }
-            });
-        };
-
-        window.getAvatarHtml = (avatarUrl, avatarColor = 'cyan', sizeClass = 'w-7 h-7', textClass = 'text-xs') => {
-            if (avatarUrl && avatarUrl.trim() !== '') {
-                return `<img src="${avatarUrl}" alt="Avatar" class="${sizeClass} rounded-full object-cover border border-slate-300" onerror="this.onerror=null; this.outerHTML='<div class=\\'${sizeClass} rounded-full flex items-center justify-center bg-cyan-50 border border-cyan-300 text-cyan-600 ${textClass}\\"><i class=\\'fa-solid fa-user\\'></i></div>'">`;
-            }
-            const colorMap = {
-                cyan: 'bg-cyan-50 text-cyan-600 border-cyan-300',
-                gray: 'bg-slate-100 text-slate-600 border-slate-300',
-                blue: 'bg-blue-50 text-blue-600 border-blue-300',
-                purple: 'bg-purple-50 text-purple-600 border-purple-300',
-                dark: 'bg-slate-800 text-slate-100 border-slate-700'
-            };
-            const themeStyle = colorMap[avatarColor] || colorMap['cyan'];
-            return `<div class="${sizeClass} rounded-full border flex items-center justify-center ${themeStyle} ${textClass} shadow-xs"><i class="fa-solid fa-user"></i></div>`;
-        };
-
-        window.updateProfileAvatarPreview = () => {
-            const avatarUrl = document.getElementById('profile-avatar')?.value.trim() || '';
-            const colorTheme = document.getElementById('profile-avatar-color')?.value || 'cyan';
-            const container = document.getElementById('profile-avatar-preview');
-            if (container) {
-                container.innerHTML = window.getAvatarHtml(avatarUrl, colorTheme, 'w-16 h-16', 'text-2xl');
-            }
-        };
-
-        window.switchTab = (tabId) => {
-            ['main-list', 'extended-list', 'stats-viewer', 'leaderboard-viewer', 'editor-panel'].forEach(t => {
-                const el = document.getElementById(`view-${t}`);
-                if (el) {
-                    if (t === tabId) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-            });
-
-            const tabBtnMain = document.getElementById('top-tab-main');
-            const tabBtnExt = document.getElementById('top-tab-extended');
-            const tabBtnStats = document.getElementById('top-tab-stats');
-            const tabBtnLdr = document.getElementById('top-tab-leaderboard');
-
-            if (tabBtnMain) tabBtnMain.className = tabId === 'main-list' ? "hover:text-cyan-600 transition pb-0.5 border-b-2 border-cyan-600 text-slate-900 font-bold" : "hover:text-cyan-600 transition text-slate-600 font-bold";
-            if (tabBtnExt) tabBtnExt.className = tabId === 'extended-list' ? "hover:text-cyan-600 transition pb-0.5 border-b-2 border-cyan-600 text-slate-900 font-bold" : "hover:text-cyan-600 transition text-slate-600 font-bold";
-            if (tabBtnStats) tabBtnStats.className = tabId === 'stats-viewer' ? "hover:text-cyan-600 transition pb-0.5 border-b-2 border-cyan-600 text-slate-900 font-bold" : "hover:text-cyan-600 transition text-slate-600 font-bold";
-            if (tabBtnLdr) tabBtnLdr.className = tabId === 'leaderboard-viewer' ? "hover:text-cyan-600 transition pb-0.5 border-b-2 border-cyan-600 text-slate-900 font-bold" : "hover:text-cyan-600 transition text-slate-600 font-bold";
-
-            if (tabId === 'stats-viewer') window.renderStatsViewer();
-            if (tabId === 'leaderboard-viewer') window.renderLeaderboardMatrix();
-            if (tabId === 'editor-panel') window.renderEditorPlayersManage();
-        };
-
-        window.renderMainAndExtendedLists = () => {
-            const mainContainer = document.getElementById('main-levels-list-container');
-            const extendedContainer = document.getElementById('extended-levels-list-container');
-            if (!mainContainer || !extendedContainer) return;
-
-            const mainLevels = window.allLevels.filter(l => l.position >= 1 && l.position <= 100);
-            const extLevels = window.allLevels.filter(l => l.position >= 101 && l.position <= 130);
-
-            const renderCard = (lvl) => {
-                const totalPts = window.calculateLevelPoints(lvl.position);
-                const minPts = (totalPts * 0.1).toFixed(2);
-                
-                return `
-                <div class="pointercrate-card p-4 flex flex-col sm:flex-row items-center sm:items-stretch gap-5">
-                    <div class="w-full sm:w-56 h-32 rounded overflow-hidden bg-slate-100 flex-shrink-0 relative group cursor-pointer border border-slate-200" onclick="openLevelDetailModal('${lvl.id}')">
-                        <img src="${window.getYouTubeThumbnail(lvl.videoUrl)}" 
-                             onerror="this.onerror=null; this.src='${window.GRAY_PLACEHOLDER}';" 
-                             alt="${lvl.name}" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
-                    </div>
-
-                    <div class="flex-grow flex flex-col justify-center space-y-1 w-full text-left">
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">
-                                <span class="cursor-pointer hover:text-cyan-600 transition" onclick="openLevelDetailModal('${lvl.id}')">#${lvl.position} – ${lvl.name}</span>
-                            </h2>
-                        </div>
-                        <p class="text-xs text-slate-600 font-medium">
-                            published by <span class="font-bold text-slate-900">${lvl.publisher}</span>
-                        </p>
-                        <p class="text-xs text-slate-400 font-medium pt-1">
-                            ${minPts} (100%) — ${totalPts.toFixed(2)} (100%) points
-                        </p>
-                    </div>
-                </div>
-            `;
-            };
-
-            mainContainer.innerHTML = mainLevels.length === 0 ? `<div class="text-center py-12 text-slate-400 font-medium"><p>No demons added yet.</p></div>` : mainLevels.map(renderCard).join('');
-            extendedContainer.innerHTML = extLevels.length === 0 ? `<div class="text-center py-12 text-slate-400 font-medium"><p>No extended list demons added yet.</p></div>` : extLevels.map(renderCard).join('');
-
-            document.getElementById('stat-main-demons').innerText = mainLevels.length;
-            document.getElementById('stat-extended-demons').innerText = extLevels.length;
-            document.getElementById('stat-total-players').innerText = window.allPlayers.length;
-            document.getElementById('stat-pending-records').innerText = window.allSubmissions.filter(s => s.status === 'pending').length;
-        };
-
-        window.renderLevelSelectDropdown = () => {
-            const select = document.getElementById('submit-level-id');
-            if (!select) return;
-            select.innerHTML = `<option value="">-- Choose Level --</option>` + window.allLevels.map(l => `
-                <option value="${l.id}">#${l.position} - ${l.name} (${window.calculateLevelPoints(l.position).toFixed(1)} pts)</option>
-            `).join('');
-        };
-
-        window.renderEditorLevelsReorder = () => {
-            const container = document.getElementById('editor-levels-reorder-list');
-            if (!container) return;
-            if (window.allLevels.length === 0) {
-                container.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">No levels registered.</div>`;
-                return;
-            }
-            container.innerHTML = window.allLevels.map(lvl => `
-                <div class="bg-slate-50 border border-slate-200 p-2.5 rounded flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-3">
-                        <span class="font-black text-cyan-600 w-8">#${lvl.position}</span>
-                        <span class="font-bold text-slate-900">${lvl.name}</span>
-                        <span class="text-slate-400">by ${lvl.publisher}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="shiftLevelPosition('${lvl.id}', -1)" title="Move Up" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-slate-700 transition"><i class="fa-solid fa-arrow-up"></i></button>
-                        <button onclick="shiftLevelPosition('${lvl.id}', 1)" title="Move Down" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-slate-700 transition"><i class="fa-solid fa-arrow-down"></i></button>
-                        <button onclick="deleteLevel('${lvl.id}', '${lvl.name}')" title="Delete Level" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded font-bold transition flex items-center gap-1 ml-2">
-                            <i class="fa-solid fa-trash-can"></i> Remove
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        window.deleteLevel = async (levelId, levelName) => {
-            const confirmed = await window.showConfirmDialog(
-                "Remove Demon Level",
-                `Are you sure you want to remove '${levelName}' from the Demonlist? All other levels will automatically adjust position.`
-            );
-
-            if (!confirmed) return;
-
-            try {
-                const { doc, deleteDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                
-                // Delete target level document
-                await deleteDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', levelId));
-
-                // Re-index remaining levels
-                const remainingLevels = window.allLevels.filter(l => l.id !== levelId).sort((a,b) => a.position - b.position);
-                for (let i = 0; i < remainingLevels.length; i++) {
-                    const newPos = i + 1;
-                    if (remainingLevels[i].position !== newPos) {
-                        remainingLevels[i].position = newPos;
-                        await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', remainingLevels[i].id), { position: newPos }, { merge: true });
-                    }
-                }
-
-                window.showToast(`Removed level '${levelName}' and recalculated list rankings!`, "info");
-            } catch (e) {
-                console.error("Delete level error:", e);
-                window.showToast("Failed to delete level.", "error");
-            }
-        };
-
-        window.shiftLevelPosition = async (id, delta) => {
-            const index = window.allLevels.findIndex(l => l.id === id);
-            if (index === -1) return;
-            const targetIndex = index + delta;
-            if (targetIndex < 0 || targetIndex >= window.allLevels.length) return;
-
-            const temp = window.allLevels[index].position;
-            window.allLevels[index].position = window.allLevels[targetIndex].position;
-            window.allLevels[targetIndex].position = temp;
-
-            window.allLevels.sort((a,b) => a.position - b.position);
-
-            // Sync update to Firestore
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', window.allLevels[index].id), window.allLevels[index], { merge: true });
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', window.allLevels[targetIndex].id), window.allLevels[targetIndex], { merge: true });
-                window.showToast("Demon positions reordered and synced!", "success");
-            } catch(e) { console.error(e); }
-        };
-
-        window.renderStatsViewer = () => {
-            const listContainer = document.getElementById('stats-players-list');
-            if (!listContainer) return;
-            const searchVal = document.getElementById('player-search')?.value.toLowerCase() || '';
-
-            const processedPlayers = window.allPlayers.map(player => {
-                let currentScore = player.bonusPoints || 0;
-                const validCompletions = (player.completedDemons || []).filter(c => {
-                    const matchedLevel = window.allLevels.find(l => l.name.toLowerCase() === c.levelName.toLowerCase() && l.position <= 130);
-                    if (matchedLevel) {
-                        const pts = window.calculateLevelPoints(matchedLevel.position);
-                        currentScore += pts;
-                        return true;
-                    }
-                    return false;
-                });
-
-                return {
-                    ...player,
-                    effectiveScore: currentScore,
-                    effectiveCompletions: validCompletions
-                };
-            });
-
-            processedPlayers.sort((a, b) => (b.effectiveScore || 0) - (a.effectiveScore || 0));
-            const filtered = processedPlayers.filter(p => p.username.toLowerCase().includes(searchVal));
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">No registered players found.</div>`;
-                return;
+        function showDetailView(levelKey = 'cloudyHaze') {
+            const level = levelData[levelKey];
+            if (level) {
+                document.getElementById('detailTitle').innerHTML = `${level.title} <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-400 text-xl hover:text-slate-600"></i></a>`;
+                document.getElementById('detailCreators').innerHTML = `by <span class="underline font-medium">${level.creator}</span>, published by <span class="font-bold">${level.publisher}</span>, verified by <span class="font-bold">${level.verifier}</span>`;
+                document.getElementById('detailDesc').textContent = level.desc;
+                document.getElementById('detailIframe').src = `https://www.youtube.com/embed/${level.videoId}`;
+                document.getElementById('detailPassword').textContent = level.password;
+                document.getElementById('detailLevelId').textContent = level.id;
+                document.getElementById('detailObjects').textContent = level.objects;
             }
 
-            listContainer.innerHTML = filtered.map((player, index) => `
-                <div onclick="selectPlayerDetails('${player.uid}')" class="py-2.5 px-2 hover:bg-cyan-50/50 cursor-pointer rounded flex items-center justify-between text-xs transition border-b border-slate-100">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-400 w-5">#${index + 1}</span>
-                        ${window.getAvatarHtml(player.avatar, player.avatarColor, 'w-6 h-6', 'text-[10px]')}
-                        <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                            ${player.username}
-                            ${(player.role === 'owner' || player.role === 'list_editor') ? '<span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-1.5 py-0.5 rounded border border-cyan-200">EDITOR</span>' : ''}
-                        </span>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-black text-cyan-600">${player.effectiveScore.toLocaleString(undefined, {maximumFractionDigits: 1})} pts</span>
-                        <span class="text-[10px] text-slate-400 block">${player.effectiveCompletions.length} Demons ${(player.bonusPoints ? `(+${player.bonusPoints} bonus)` : '')}</span>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        window.renderLeaderboardMatrix = () => {
-            const tbody = document.getElementById('leaderboard-table-body');
-            const totalEl = document.getElementById('leaderboard-total-count');
-            if (!tbody) return;
-
-            const processed = window.allPlayers.map(p => {
-                let score = p.bonusPoints || 0;
-                let mainCount = 0;
-                let extCount = 0;
-
-                (p.completedDemons || []).forEach(c => {
-                    const matched = window.allLevels.find(l => l.name.toLowerCase() === c.levelName.toLowerCase());
-                    if (matched) {
-                        if (matched.position <= 100) mainCount++;
-                        else if (matched.position <= 130) extCount++;
-                        score += window.calculateLevelPoints(matched.position);
-                    }
-                });
-
-                return { ...p, score, mainCount, extCount };
-            });
-
-            processed.sort((a,b) => b.score - a.score);
-
-            if (totalEl) totalEl.innerText = `Total Competitors: ${processed.length}`;
-
-            if (processed.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">No player standings recorded.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = processed.map((p, idx) => `
-                <tr class="hover:bg-cyan-50/30 transition">
-                    <td class="p-3 font-extrabold ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-slate-600'}">#${idx + 1}</td>
-                    <td class="p-3 flex items-center gap-2">
-                        ${window.getAvatarHtml(p.avatar, p.avatarColor, 'w-6 h-6', 'text-[10px]')}
-                        <span class="font-bold text-slate-800">${p.username}</span>
-                    </td>
-                    <td class="p-3 text-center font-bold text-cyan-700">${p.mainCount}</td>
-                    <td class="p-3 text-center font-bold text-slate-600">${p.extCount}</td>
-                    <td class="p-3 text-right font-black text-cyan-600">${p.score.toLocaleString(undefined, {maximumFractionDigits: 1})} pts</td>
-                </tr>
-            `).join('');
-        };
-
-        window.filterPlayers = () => window.renderStatsViewer();
-
-        window.selectPlayerDetails = (uid) => {
-            const player = window.allPlayers.find(p => p.uid === uid);
-            if (!player) return;
-
-            let currentScore = player.bonusPoints || 0;
-            const validCompletions = (player.completedDemons || []).filter(c => {
-                const matchedLevel = window.allLevels.find(l => l.name.toLowerCase() === c.levelName.toLowerCase() && l.position <= 130);
-                if (matchedLevel) {
-                    const pts = window.calculateLevelPoints(matchedLevel.position);
-                    currentScore += pts;
-                    return { ...c, currentPts: pts };
-                }
-                return false;
-            });
-
-            const container = document.getElementById('player-details-container');
-
-            container.innerHTML = `
-                <div class="w-full text-left space-y-4">
-                    <div class="flex items-center justify-between border-b pb-3">
-                        <div class="flex items-center gap-3">
-                            ${window.getAvatarHtml(player.avatar, player.avatarColor, 'w-10 h-10', 'text-base')}
-                            <div>
-                                <h2 class="text-xl font-black text-slate-900">${player.username}</h2>
-                                <p class="text-xs text-slate-500">Player Profile ${(player.bonusPoints ? `<span class="text-cyan-600 font-bold">(${player.bonusPoints > 0 ? '+' : ''}${player.bonusPoints} bonus pts)</span>` : '')}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xl font-black text-cyan-600">${currentScore.toLocaleString(undefined, {maximumFractionDigits: 1})} pts</p>
-                            <p class="text-[10px] uppercase font-bold text-slate-400">Total List Score</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Completed Demons (${validCompletions.length})</h4>
-                        ${validCompletions.length === 0 ? `
-                            <p class="text-xs text-slate-400 italic py-2">No active demon completions on the list.</p>
-                        ` : `
-                            <div class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-                                ${validCompletions.map(d => {
-                                    const matched = window.allLevels.find(l => l.name.toLowerCase() === d.levelName.toLowerCase());
-                                    const pts = matched ? window.calculateLevelPoints(matched.position) : 0;
-                                    return `
-                                        <div class="bg-slate-50 border border-slate-200 p-2 rounded text-xs flex justify-between items-center">
-                                            <div>
-                                                <span class="font-bold text-slate-800">${d.levelName}</span>
-                                                <span class="text-[10px] bg-cyan-50 text-cyan-800 font-bold px-1.5 py-0.5 rounded border border-cyan-200 ml-2">+${pts.toFixed(1)} pts</span>
-                                            </div>
-                                            <a href="${d.videoUrl}" target="_blank" class="text-cyan-600 text-xs hover:underline flex items-center gap-1">
-                                                <i class="fa-solid fa-video"></i> Proof
-                                            </a>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        `}
-                    </div>
-                </div>
-            `;
-        };
-
-        window.renderEditorPlayersManage = () => {
-            const container = document.getElementById('editor-players-manage-list');
-            const selectEl = document.getElementById('point-adj-player');
-            if (selectEl) {
-                selectEl.innerHTML = `<option value="">-- Choose Player --</option>` + window.allPlayers.map(p => `
-                    <option value="${p.uid}">${p.username} (${(p.bonusPoints || 0)} bonus pts)</option>
-                `).join('');
-            }
-
-            if (!container) return;
-            if (window.allPlayers.length === 0) {
-                container.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">No players registered.</div>`;
-                return;
-            }
-
-            container.innerHTML = window.allPlayers.map((player) => `
-                <div class="flex items-center justify-between py-2 px-1 text-xs">
-                    <div class="flex items-center gap-2">
-                        ${window.getAvatarHtml(player.avatar, player.avatarColor, 'w-6 h-6', 'text-[10px]')}
-                        <span class="font-bold text-slate-800">${player.username}</span>
-                        <span class="text-[10px] text-cyan-700 font-bold bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">${player.bonusPoints || 0} Bonus Pts</span>
-                    </div>
-                    ${player.role === 'owner' ? `
-                        <span class="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded border border-cyan-200">List Editor</span>
-                    ` : `
-                        <button onclick="deletePlayer('${player.uid}', '${player.username}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-xs flex items-center gap-1 transition shadow-xs">
-                            <i class="fa-solid fa-user-xmark"></i> Remove Player
-                        </button>
-                    `}
-                </div>
-            `).join('');
-        };
-
-        window.handleManualPointAdjustment = async (e) => {
-            e.preventDefault();
-            const playerUid = document.getElementById('point-adj-player').value;
-            const amount = parseFloat(document.getElementById('point-adj-amount').value) || 0;
-
-            if (!playerUid) {
-                window.showToast("Please select a player!", "error");
-                return;
-            }
-
-            const targetPlayer = window.allPlayers.find(p => p.uid === playerUid);
-            if (!targetPlayer) return;
-
-            const newBonus = (targetPlayer.bonusPoints || 0) + amount;
-
-            const notifs = [...(targetPlayer.notifications || [])];
-            notifs.unshift({
-                id: 'notif_' + Date.now(),
-                message: `List Editor adjusted your points by ${amount > 0 ? '+' : ''}${amount} pts!`,
-                timestamp: Date.now()
-            });
-
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'players', playerUid), {
-                    bonusPoints: newBonus,
-                    notifications: notifs
-                }, { merge: true });
-
-                e.target.reset();
-                window.showToast(`Updated points for ${targetPlayer.username}!`, "success");
-            } catch(err) {
-                console.error("Point adjust error:", err);
-            }
-        };
-
-        window.deletePlayer = async (uid, name) => {
-            const confirmed = await window.showConfirmDialog(
-                "Remove Registered Player",
-                `Are you sure you want to remove player '${name}' from the list database?`
-            );
-            if (confirmed) {
-                try {
-                    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                    await deleteDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'players', uid));
-                    window.showToast(`Removed player '${name}'.`, "info");
-                } catch(e) { console.error(e); }
-            }
-        };
-
-        window.renderSubmissionsInbox = () => {
-            const container = document.getElementById('submissions-inbox-list');
-            if (!container) return;
-            const pending = window.allSubmissions.filter(s => s.status === 'pending');
-            
-            const badge = document.getElementById('inbox-badge');
-            const inboxCount = document.getElementById('editor-inbox-count');
-            if (badge) {
-                badge.innerText = pending.length;
-                if (pending.length > 0) badge.classList.remove('hidden');
-                else badge.classList.add('hidden');
-            }
-            if (inboxCount) inboxCount.innerText = pending.length;
-
-            if (pending.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">No pending record submissions.</div>`;
-                return;
-            }
-
-            container.innerHTML = pending.map(sub => `
-                <div class="pointercrate-card bg-white p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs border-l-4 border-l-cyan-500">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-900">${sub.playerName}</span>
-                            <span class="text-cyan-600 font-semibold">${sub.levelName}</span>
-                        </div>
-                        <p class="text-slate-500 mt-1">${sub.notes || 'No extra notes.'}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <a href="${sub.videoUrl}" target="_blank" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded flex items-center gap-1">
-                            <i class="fa-solid fa-video text-cyan-600"></i> Proof
-                        </a>
-                        <button onclick="handleApproveSubmission('${sub.id}', true)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm flex items-center gap-1">
-                            <i class="fa-solid fa-check"></i> Yes (Approve)
-                        </button>
-                        <button onclick="handleApproveSubmission('${sub.id}', false)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded shadow-sm flex items-center gap-1">
-                            <i class="fa-solid fa-xmark"></i> No (Reject)
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        window.handleApproveSubmission = async (subId, isApproved) => {
-            const sub = window.allSubmissions.find(s => s.id === subId);
-            if (!sub) return;
-
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                
-                // Find or create player
-                let player = window.allPlayers.find(p => p.username.toLowerCase() === sub.playerName.toLowerCase());
-                const playerUid = player ? player.uid : 'p_' + Date.now();
-
-                const notifs = player ? [...(player.notifications || [])] : [];
-
-                if (isApproved) {
-                    sub.status = 'approved';
-                    const completions = player ? [...(player.completedDemons || [])] : [];
-                    completions.push({ levelName: sub.levelName, videoUrl: sub.videoUrl });
-
-                    notifs.unshift({
-                        id: 'notif_' + Date.now(),
-                        message: `Your record submission for '${sub.levelName}' was APPROVED by 7r4ject0ry!`,
-                        timestamp: Date.now()
-                    });
-
-                    const updatedPlayer = {
-                        uid: playerUid,
-                        username: player ? player.username : sub.playerName,
-                        role: player ? player.role : 'player',
-                        avatar: player ? (player.avatar || '') : '',
-                        avatarColor: player ? (player.avatarColor || 'cyan') : 'cyan',
-                        completedDemons: completions,
-                        notifications: notifs
-                    };
-
-                    await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'players', playerUid), updatedPlayer, { merge: true });
-                    window.showToast(`Approved submission by ${sub.playerName}!`, "success");
-                } else {
-                    sub.status = 'rejected';
-
-                    notifs.unshift({
-                        id: 'notif_' + Date.now(),
-                        message: `Your record submission for '${sub.levelName}' was REJECTED by 7r4ject0ry.`,
-                        timestamp: Date.now()
-                    });
-
-                    if (player) {
-                        await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'players', playerUid), {
-                            notifications: notifs
-                        }, { merge: true });
-                    }
-
-                    window.showToast(`Rejected submission by ${sub.playerName}.`, "info");
-                }
-
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'submissions', sub.id), sub, { merge: true });
-            } catch(e) { console.error(e); }
-        };
-
-        window.openAuthModal = () => document.getElementById('auth-modal')?.classList.remove('hidden');
-        window.closeAuthModal = () => document.getElementById('auth-modal')?.classList.add('hidden');
-        
-        window.openProfileModal = () => {
-            renderUserNotifications();
-            document.getElementById('profile-modal')?.classList.remove('hidden');
-        };
-        
-        window.closeProfileModal = () => document.getElementById('profile-modal')?.classList.add('hidden');
-
-        window.openSubmitRecordModal = () => {
-            if (!window.currentUserData) {
-                window.showToast("You must log in before submitting a record!", "error");
-                window.openAuthModal();
-                return;
-            }
-            const displayEl = document.getElementById('submit-player-display');
-            if (displayEl) {
-                displayEl.innerHTML = `${window.getAvatarHtml(window.currentUserData.avatar, window.currentUserData.avatarColor || 'cyan', 'w-4 h-4', 'text-[8px]')} <span>${window.currentUserData.username}</span>`;
-            }
-            document.getElementById('submit-record-modal')?.classList.remove('hidden');
-        };
-
-        window.closeSubmitRecordModal = () => document.getElementById('submit-record-modal')?.classList.add('hidden');
-
-        function renderUserNotifications() {
-            const listEl = document.getElementById('user-notifications-list');
-            if (!listEl) return;
-            const notifs = window.currentUserData?.notifications || [];
-
-            if (notifs.length === 0) {
-                listEl.innerHTML = `<p class="text-slate-400 italic py-2">No inbox notifications yet.</p>`;
-                return;
-            }
-
-            listEl.innerHTML = notifs.map(n => `
-                <div class="p-2 bg-slate-50 border border-slate-200 rounded flex items-center justify-between text-xs">
-                    <span class="font-medium text-slate-800">${n.message}</span>
-                    <span class="text-[10px] text-cyan-600 font-bold">Placed</span>
-                </div>
-            `).join('');
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.updateAuthUI = () => {
-            const container = document.getElementById('auth-header-container');
-            const editorBtn = document.getElementById('editor-panel-btn');
-
-            if (window.currentUserData) {
-                const isEditor = window.currentUserData.role === 'owner' || window.currentUserData.role === 'list_editor';
-                if (isEditor) editorBtn.classList.remove('hidden');
-                else editorBtn.classList.add('hidden');
-
-                container.innerHTML = `
-                    <button onclick="openProfileModal()" class="bg-cyan-50 border border-cyan-200 hover:bg-cyan-100 text-slate-900 px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 relative">
-                        ${window.getAvatarHtml(window.currentUserData.avatar, window.currentUserData.avatarColor || 'cyan', 'w-5 h-5', 'text-[10px]')}
-                        <span>${window.currentUserData.username}</span>
-                        <i class="fa-solid fa-user-gear text-cyan-600 ml-1"></i>
-                    </button>
-                `;
-
-                if (document.getElementById('profile-username')) document.getElementById('profile-username').value = window.currentUserData.username;
-                if (document.getElementById('profile-avatar')) document.getElementById('profile-avatar').value = window.currentUserData.avatar || '';
-                if (document.getElementById('profile-avatar-color')) document.getElementById('profile-avatar-color').value = window.currentUserData.avatarColor || 'cyan';
-                window.updateProfileAvatarPreview();
-            } else {
-                editorBtn.classList.add('hidden');
-                container.innerHTML = `
-                    <button onclick="openAuthModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition flex items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                        <span>Log In</span>
-                    </button>
-                `;
-            }
-        };
-
-        window.handleLogout = async () => {
-            window.currentUserData = null;
-            localStorage.removeItem('traject_user_session');
-            if (window.firebaseAuth) {
-                try {
-                    const { signOut } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
-                    await signOut(window.firebaseAuth);
-                } catch(e){}
-            }
-            window.updateAuthUI();
-            window.closeProfileModal();
-            window.showToast("Logged out successfully", "info");
-        };
-
-        window.handleSaveProfile = async (e) => {
-            e.preventDefault();
-            if (!window.currentUserData) return;
-
-            const newName = document.getElementById('profile-username').value.trim();
-            const newAvatar = document.getElementById('profile-avatar').value.trim();
-            const newColor = document.getElementById('profile-avatar-color').value;
-
-            window.currentUserData.username = newName;
-            window.currentUserData.avatar = newAvatar;
-            window.currentUserData.avatarColor = newColor;
-
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'user_accounts', window.currentUserData.uid), window.currentUserData, { merge: true });
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'players', window.currentUserData.uid), {
-                    username: newName,
-                    avatar: newAvatar,
-                    avatarColor: newColor
-                }, { merge: true });
-
-                localStorage.setItem('traject_user_session', JSON.stringify(window.currentUserData));
-                window.updateAuthUI();
-                window.closeProfileModal();
-                window.showToast("Profile changes saved to cloud database!", "success");
-            } catch(e) { console.error(e); }
-        };
-
-        window.handleAddLevel = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('new-level-name').value.trim();
-            const publisher = document.getElementById('new-level-publisher').value.trim();
-            const creator = document.getElementById('new-level-creator').value.trim();
-            const verifier = document.getElementById('new-level-verifier').value.trim();
-            const levelId = document.getElementById('new-level-id').value.trim();
-            const videoUrl = document.getElementById('new-level-yt').value.trim();
-            
-            let requestedPos = parseInt(document.getElementById('new-level-position').value) || 1;
-            const maxPos = window.allLevels.length + 1;
-            if (requestedPos < 1) requestedPos = 1;
-            if (requestedPos > maxPos) requestedPos = maxPos;
-
-            const newLvl = {
-                id: 'lvl_' + Date.now(),
-                position: requestedPos,
-                name, publisher, creator, verifier, levelId, videoUrl
-            };
-
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-
-                // Shift existing levels at or below target position
-                for (let l of window.allLevels) {
-                    if (l.position >= requestedPos) {
-                        l.position++;
-                        await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', l.id), { position: l.position }, { merge: true });
-                    }
-                }
-
-                // Insert new level at requested rank
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'levels', newLvl.id), newLvl);
-
-                e.target.reset();
-                if (document.getElementById('new-level-position')) {
-                    document.getElementById('new-level-position').value = 1;
-                }
-                window.showToast(`Added ${name} at Top #${requestedPos} in server database!`, "success");
-            } catch(e) { console.error(e); }
-        };
-
-        window.handleSubmitRecord = async (e) => {
-            e.preventDefault();
-            if (!window.currentUserData) {
-                window.showToast("You must log in before submitting a record!", "error");
-                window.openAuthModal();
-                return;
-            }
-
-            const levelId = document.getElementById('submit-level-id').value;
-            const playerName = window.currentUserData.username;
-            const videoUrl = document.getElementById('submit-video-url').value.trim();
-            const notes = document.getElementById('submit-notes').value.trim();
-
-            const level = window.allLevels.find(l => l.id === levelId);
-            const levelName = level ? level.name : 'Unknown';
-
-            const sub = {
-                id: 'sub_' + Date.now(),
-                levelId, levelName, playerName, videoUrl, notes, status: 'pending', createdAt: Date.now()
-            };
-
-            try {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                await setDoc(doc(window.firebaseDB, 'artifacts', window.appId, 'public', 'data', 'submissions', sub.id), sub);
-
-                window.closeSubmitRecordModal();
-                e.target.reset();
-                window.showToast("Demon record submitted to server for verification!", "success");
-            } catch(e) { console.error(e); }
-        };
-
-        window.onload = () => {
-            // Check if user previously logged in
-            const savedSession = localStorage.getItem('traject_user_session');
-            if (savedSession) {
-                try { 
-                    window.currentUserData = JSON.parse(savedSession); 
-                    window.showToast(`Auto-logged in as ${window.currentUserData.username}`, "info");
-                } catch(e) {
-                    window.currentUserData = null;
-                    localStorage.removeItem('traject_user_session');
-                }
-            } else {
-                // First time visitor or logged out user - keep as guest / not logged in
-                window.currentUserData = null;
-            }
-            window.updateAuthUI();
-        };
+        function showListView() {
+            document.getElementById('detailView').classList.add('hidden');
+            document.getElementById('listView').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
