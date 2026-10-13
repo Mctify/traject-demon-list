@@ -241,7 +241,7 @@
                             published by <span class="font-bold">extrahotsauce</span>, 
                             verified by <span class="font-bold">extrahotsauce</span>
                         </p>
-                        <p id="detailDesc" class="text-xs italic text-slate-400 mt-1">"yeah ok this my level wow"</p>
+                        <p id="detailDesc" class="text-xs italic text-slate-400 mt-1">"-"</p>
 
                         <!-- Video Container -->
                         <div class="mt-4 rounded overflow-hidden aspect-video bg-black relative max-w-2xl mx-auto shadow">
@@ -249,7 +249,7 @@
                         </div>
 
                         <!-- Level Metadata Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6 pt-4 border-t text-center text-xs justify-center">
+                        <div class="grid grid-cols-2 gap-3 mt-6 pt-4 border-t text-center text-xs justify-center max-w-md mx-auto">
                             <div>
                                 <div class="text-slate-500 font-medium text-[11px]">Level Password</div>
                                 <div id="detailPassword" class="font-bold text-slate-700 mt-0.5">Free Copy</div>
@@ -257,10 +257,6 @@
                             <div>
                                 <div class="text-slate-500 font-medium text-[11px]">Level ID</div>
                                 <div id="detailLevelId" class="font-bold text-slate-700 mt-0.5">144366482</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 font-medium text-[11px]">Object Count</div>
-                                <div id="detailObjects" class="font-bold text-slate-700 mt-0.5">--</div>
                             </div>
                         </div>
 
@@ -321,33 +317,30 @@
                 creator: "extrahotsauce",
                 publisher: "extrahotsauce",
                 verifier: "extrahotsauce",
-                desc: '"yeah ok this my level wow"',
+                desc: "-",
                 videoId: "u66qmaYVBW8",
                 password: "Free Copy",
-                id: "144366482",
-                objects: "N/A"
+                id: "144366482"
             },
             valtuhedClubstwp: {
                 title: "VALTUHED CLUBSTWP",
                 creator: "7r4ject0ry",
                 publisher: "7r4ject0ry",
                 verifier: "7r4ject0ry",
-                desc: '"Valtuhed Clubstwp Level Description"',
+                desc: "-",
                 videoId: "4-CdAOrmUWQ",
                 password: "Free Copy",
-                id: "149766804",
-                objects: "N/A"
+                id: "149766804"
             },
             artificialMixed: {
                 title: "ARTIFICIAL MIXED",
                 creator: "7r4ject0ry",
                 publisher: "7r4ject0ry",
                 verifier: "7r4ject0ry",
-                desc: '"Artificial Mixed Level Description"',
+                desc: "-",
                 videoId: "fa6oMGz3h6o",
                 password: "Free Copy",
-                id: "150213588",
-                objects: "N/A"
+                id: "150213588"
             }
         };
 
@@ -360,7 +353,6 @@
                 document.getElementById('detailIframe').src = `https://www.youtube.com/embed/${level.videoId}?enablejsapi=1&autoplay=1`;
                 document.getElementById('detailPassword').textContent = level.password;
                 document.getElementById('detailLevelId').textContent = level.id;
-                document.getElementById('detailObjects').textContent = level.objects;
             }
 
             document.getElementById('listView').classList.add('hidden');
