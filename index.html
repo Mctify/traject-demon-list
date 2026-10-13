@@ -286,6 +286,19 @@
                     </div>
                 </div>
 
+                <!-- Discord Server Card -->
+                <div class="pc-card p-5 text-center">
+                    <h3 class="font-bold text-slate-700 text-base mb-3 flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-discord text-indigo-500 text-lg"></i> Discord Server
+                    </h3>
+                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Join our Discord community to stay updated, submit records, and chat with other members!
+                    </p>
+                    <a href="https://discord.gg/F4JShJA5dt" target="_blank" rel="noopener noreferrer" class="inline-block w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded transition shadow-sm">
+                        discord.gg/F4JShJA5dt
+                    </a>
+                </div>
+
                 <!-- Guidelines Card -->
                 <div class="pc-card p-5 text-center">
                     <h3 class="font-bold text-slate-700 text-base mb-3">Guidelines</h3>
@@ -344,7 +357,7 @@
                 document.getElementById('detailTitle').innerHTML = `${level.title} <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-400 text-xl hover:text-slate-600"></i></a>`;
                 document.getElementById('detailCreators').innerHTML = `by <span class="underline font-medium">${level.creator}</span>, published by <span class="font-bold">${level.publisher}</span>, verified by <span class="font-bold">${level.verifier}</span>`;
                 document.getElementById('detailDesc').textContent = level.desc;
-                document.getElementById('detailIframe').src = `https://www.youtube.com/embed/${level.videoId}`;
+                document.getElementById('detailIframe').src = `https://www.youtube.com/embed/${level.videoId}?enablejsapi=1&autoplay=1`;
                 document.getElementById('detailPassword').textContent = level.password;
                 document.getElementById('detailLevelId').textContent = level.id;
                 document.getElementById('detailObjects').textContent = level.objects;
@@ -356,6 +369,12 @@
         }
 
         function showListView() {
+            // Stop playing video when returning to main list view
+            const iframe = document.getElementById('detailIframe');
+            if (iframe) {
+                iframe.src = "about:blank";
+            }
+
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('listView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
