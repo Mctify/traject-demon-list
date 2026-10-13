@@ -1,2 +1,2 @@
 # traject-demon-list
-cool
+discord: discord.gg/F4JShJA5dt
