@@ -6,81 +6,113 @@
     <title>Traject Demonlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.cdnfonts.com/css/pusab" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f6f9;
-            color: #4a4a4a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #080c14;
+            color: #d1d5db;
+            min-height: 100vh;
             overflow-x: hidden;
+            /* Enhanced Blue Gradient Glow matching FB MODS background aesthetics */
+            background-image: 
+                radial-gradient(ellipse at 50% -10%, rgba(37, 99, 235, 0.25) 0%, rgba(14, 165, 233, 0.12) 40%, transparent 75%),
+                radial-gradient(circle at 10% 20%, rgba(29, 78, 216, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.12) 0%, transparent 45%),
+                linear-gradient(to bottom, #070a10, #0c111a);
+            background-attachment: fixed;
         }
 
-        /* Custom Pixel/Cube Background Borders */
+        /* Pusab Font Class for Geometry Dash Headings */
+        .font-pusab {
+            font-family: 'Pusab', 'Inter', sans-serif !important;
+            letter-spacing: 0.6px;
+        }
+
+        /* Custom Pixel/Cube Background Borders - Modern Dark Overlay */
         .side-decoration {
             position: fixed;
             top: 0;
             bottom: 0;
-            width: 140px;
+            width: 130px;
             z-index: 10;
             pointer-events: none;
             display: flex;
             flex-wrap: wrap;
             align-content: flex-start;
-            gap: 2px;
+            gap: 3px;
             padding: 10px;
             overflow: hidden;
+            opacity: 0.65;
         }
 
-        .side-left {
-            left: 0;
-        }
-
-        .side-right {
-            right: 0;
-        }
+        .side-left { left: 0; }
+        .side-right { right: 0; }
 
         .bg-cube {
-            width: 28px;
-            height: 28px;
-            opacity: 0.85;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
             transition: transform 0.3s ease;
         }
 
-        .c-blue-1 { background-color: #0070ba; }
-        .c-blue-2 { background-color: #005691; }
-        .c-blue-3 { background-color: #0088cc; }
-        .c-blue-4 { background-color: #00aaff; }
-        .c-blue-5 { background-color: #003d66; }
+        .c-blue-1 { background-color: #1e3a8a; }
+        .c-blue-2 { background-color: #1d4ed8; }
+        .c-blue-3 { background-color: #2563eb; }
+        .c-blue-4 { background-color: #0284c7; }
+        .c-blue-5 { background-color: #0369a1; }
 
-        /* Pointercrate Card styling */
+        /* FB MODS Dark Card Styling with subtle blue tint border */
         .pc-card {
-            background: #ffffff;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-            border: 1px solid #e1e8ed;
+            background: rgba(15, 21, 34, 0.88);
+            border-radius: 14px;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .pc-card-hover {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pc-card-hover:hover {
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.45);
+            box-shadow: 0 14px 40px rgba(14, 165, 233, 0.22);
         }
 
         .nav-tab {
             font-weight: 700;
-            color: #7f8c8d;
-            padding: 10px 20px;
+            color: #94a3b8;
+            padding: 14px 24px;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
         }
 
         .nav-tab.active {
-            color: #2c3e50;
-            border-bottom: 3px solid #0070ba;
+            color: #38bdf8;
+            border-bottom: 3px solid #38bdf8;
         }
 
-        .nav-tab:hover:not(.active) {
-            color: #34495e;
-        }
-
-        /* Top Nav Header */
         .header-shadow {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            background: rgba(7, 10, 16, 0.88);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* FB MODS Blue/Teal Glow Button */
+        .btn-glow {
+            background: linear-gradient(135deg, #2563eb, #0284c7);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 6px 24px rgba(2, 132, 199, 0.6);
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -107,162 +139,168 @@
         </script>
     </div>
 
-    <!-- Main Navbar -->
-    <header class="bg-white header-shadow relative z-20">
+    <!-- Main Header -->
+    <header class="header-shadow sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="#" onclick="showListView()" class="font-extrabold text-xl tracking-tight text-slate-700 hover:text-blue-600 transition">
-                TRAJECT DEMONLIST<span class="text-blue-500 text-xs align-super">.COM</span>
+            <!-- Brand Logo with Pusab Font including .COM -->
+            <a href="#" onclick="showListView()" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-pusab text-white text-sm shadow-lg shadow-blue-500/30">
+                    TD
+                </div>
+                <span class="font-pusab text-xl tracking-wide text-white group-hover:text-sky-400 transition">
+                    TRAJECT DEMONLIST<span class="font-pusab text-sky-400 text-sm ml-0.5">.COM</span>
+                </span>
             </a>
 
             <!-- Nav Links -->
-            <nav class="hidden md:flex items-center space-x-6 text-xs uppercase font-bold tracking-wider text-slate-600">
-                <a href="#" class="text-center hover:text-blue-600 transition">
-                    <span class="block text-[10px] text-slate-400 leading-none">REST API</span>
+            <nav class="hidden md:flex items-center space-x-6 text-xs uppercase font-bold tracking-wider text-slate-300">
+                <a href="#" class="text-center hover:text-sky-400 transition">
+                    <span class="block text-[10px] text-slate-500 leading-none">REST API</span>
                     Documentation
                 </a>
-                <a href="#" class="text-center hover:text-blue-600 transition">
-                    <span class="block text-[10px] text-slate-400 leading-none">POINTERCRATE</span>
+                <a href="#" class="text-center hover:text-sky-400 transition">
+                    <span class="block text-[10px] text-slate-500 leading-none">POINTERCRATE</span>
                     User Area
                 </a>
-                <a href="#" class="text-center text-blue-600 flex items-center gap-1">
+                <a href="#" class="text-center text-sky-400 flex items-center gap-1">
                     <div>
-                        <span class="block text-[10px] text-slate-400 leading-none">Geometry Dash</span>
+                        <span class="block text-[10px] text-slate-500 leading-none">Geometry Dash</span>
                         TRAJECT DEMONLIST
                     </div>
                     <i class="fa-solid fa-caret-down text-xs"></i>
                 </a>
-                <div class="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition">
+                <div class="flex items-center gap-1 cursor-pointer hover:text-sky-400 transition">
                     <span>EN</span>
                     <i class="fa-solid fa-caret-down text-xs"></i>
                 </div>
             </nav>
 
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-slate-600 text-xl focus:outline-none">
+            <button class="md:hidden text-slate-300 text-xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-5xl mx-auto px-4 py-6 relative z-20">
+        <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 relative z-20">
         
-        <!-- List Tabs Navigation Bar -->
-        <div class="pc-card mb-6 flex items-center justify-around text-xs md:text-sm border-b">
-            <button class="nav-tab active flex-1 text-center py-3">Main List</button>
+        <!-- Tab Navigation -->
+        <div class="pc-card mb-6 flex items-center justify-around text-xs md:text-sm overflow-hidden">
+            <button class="nav-tab active flex-1 text-center py-3.5 font-pusab text-sm md:text-base tracking-wide">Main List</button>
         </div>
 
-        <!-- Grid Layout: Main Content Left, Sidebars Right -->
+        <!-- Grid Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- Left Column: Level Content -->
             <div class="lg:col-span-2 space-y-4">
                 
-                <!-- View 1: Level List Items -->
+                <!-- View 1: Level List View -->
                 <div id="listView" class="space-y-4">
+                    
                     <!-- #1 Cloudy Haze Card -->
-                    <div onclick="showDetailView('cloudyHaze')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
-                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
-                            <img src="https://img.youtube.com/vi/u66qmaYVBW8/hqdefault.jpg" alt="Cloudy Haze Thumbnail" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                    <div onclick="showDetailView('cloudyHaze')" class="pc-card pc-card-hover p-4 flex flex-col sm:flex-row gap-4 items-center cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-900 rounded-lg overflow-hidden flex-shrink-0 relative group border border-slate-700/50">
+                            <img src="https://img.youtube.com/vi/u66qmaYVBW8/hqdefault.jpg" alt="Cloudy Haze Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl drop-shadow"></i>
                             </div>
                         </div>
                         <div class="flex-1 text-center sm:text-left">
-                            <h2 class="text-xl font-bold text-slate-800">
+                            <h2 class="text-xl md:text-2xl font-pusab text-white leading-snug">
                                 #1 – cloudy haze
                             </h2>
-                            <p class="text-sm font-semibold text-slate-600 mt-1">
-                                published by <span class="text-slate-800 font-bold">extrahotsauce</span>
+                            <p class="text-xs font-semibold text-slate-400 mt-2">
+                                published by <span class="text-sky-400 font-bold">extrahotsauce</span>
                             </p>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                verified by <span class="text-slate-700 font-medium">extrahotsauce</span>
+                            <p class="text-xs text-slate-400 mt-1">
+                                verified by <span class="text-sky-400 font-medium">extrahotsauce</span>
                             </p>
                         </div>
                     </div>
 
                     <!-- #2 Valtuhed Clubstwp Card -->
-                    <div onclick="showDetailView('valtuhedClubstwp')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
-                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
-                            <img src="https://img.youtube.com/vi/4-CdAOrmUWQ/hqdefault.jpg" alt="Valtuhed Clubstwp Thumbnail" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                    <div onclick="showDetailView('valtuhedClubstwp')" class="pc-card pc-card-hover p-4 flex flex-col sm:flex-row gap-4 items-center cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-900 rounded-lg overflow-hidden flex-shrink-0 relative group border border-slate-700/50">
+                            <img src="https://img.youtube.com/vi/4-CdAOrmUWQ/hqdefault.jpg" alt="Valtuhed Clubstwp Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl drop-shadow"></i>
                             </div>
                         </div>
                         <div class="flex-1 text-center sm:text-left">
-                            <h2 class="text-xl font-bold text-slate-800">
+                            <h2 class="text-xl md:text-2xl font-pusab text-white leading-snug">
                                 #2 – Valtuhed Clubstwp
                             </h2>
-                            <p class="text-sm font-semibold text-slate-600 mt-1">
-                                published by <span class="text-slate-800 font-bold">7r4ject0ry</span>
+                            <p class="text-xs font-semibold text-slate-400 mt-2">
+                                published by <span class="text-sky-400 font-bold">7r4ject0ry</span>
                             </p>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                verified by <span class="text-slate-700 font-medium">7r4ject0ry</span>
+                            <p class="text-xs text-slate-400 mt-1">
+                                verified by <span class="text-sky-400 font-medium">7r4ject0ry</span>
                             </p>
                         </div>
                     </div>
 
                     <!-- #3 Artificial Mixed Card -->
-                    <div onclick="showDetailView('artificialMixed')" class="pc-card p-4 flex flex-col sm:flex-row gap-4 items-center hover:shadow-md transition cursor-pointer">
-                        <div class="w-full sm:w-48 h-28 bg-slate-200 rounded overflow-hidden flex-shrink-0 relative group">
-                            <img src="https://img.youtube.com/vi/fa6oMGz3h6o/hqdefault.jpg" alt="Artificial Mixed Thumbnail" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                    <div onclick="showDetailView('artificialMixed')" class="pc-card pc-card-hover p-4 flex flex-col sm:flex-row gap-4 items-center cursor-pointer">
+                        <div class="w-full sm:w-48 h-28 bg-slate-900 rounded-lg overflow-hidden flex-shrink-0 relative group border border-slate-700/50">
+                            <img src="https://img.youtube.com/vi/fa6oMGz3h6o/hqdefault.jpg" alt="Artificial Mixed Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl drop-shadow"></i>
                             </div>
                         </div>
                         <div class="flex-1 text-center sm:text-left">
-                            <h2 class="text-xl font-bold text-slate-800">
+                            <h2 class="text-xl md:text-2xl font-pusab text-white leading-snug">
                                 #3 – Artificial Mixed
                             </h2>
-                            <p class="text-sm font-semibold text-slate-600 mt-1">
-                                published by <span class="text-slate-800 font-bold">7r4ject0ry</span>
+                            <p class="text-xs font-semibold text-slate-400 mt-2">
+                                published by <span class="text-sky-400 font-bold">7r4ject0ry</span>
                             </p>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                verified by <span class="text-slate-700 font-medium">7r4ject0ry</span>
+                            <p class="text-xs text-slate-400 mt-1">
+                                verified by <span class="text-sky-400 font-medium">7r4ject0ry</span>
                             </p>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- View 2: Detailed Level View -->
                 <div id="detailView" class="hidden space-y-4">
-                    <!-- Main Level Card Details -->
                     <div class="pc-card p-6 text-center">
-                        <button onclick="showListView()" class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-2 hover:underline inline-flex items-center gap-1">
+                        <button onclick="showListView()" class="text-xs text-sky-400 font-bold uppercase tracking-wider mb-4 hover:underline inline-flex items-center gap-1.5 bg-sky-950/40 px-3 py-1.5 rounded-full border border-sky-500/20">
                             <i class="fa-solid fa-arrow-left"></i> Back to list
                         </button>
 
-                        <h1 id="detailTitle" class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center justify-center gap-2 uppercase">
-                            CLOUDY HAZE <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-400 text-xl hover:text-slate-600"></i></a>
+                        <h1 id="detailTitle" class="text-2xl md:text-4xl font-pusab text-white tracking-tight flex items-center justify-center gap-3 uppercase">
+                            CLOUDY HAZE <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-500 text-xl hover:text-white transition"></i></a>
                         </h1>
-                        <p id="detailCreators" class="text-xs text-slate-600 mt-2">
-                            by <span class="underline font-medium">extrahotsauce</span>, 
-                            published by <span class="font-bold">extrahotsauce</span>, 
-                            verified by <span class="font-bold">extrahotsauce</span>
+                        <p id="detailCreators" class="text-xs text-slate-300 mt-3">
+                            by <span class="underline font-medium text-sky-400">extrahotsauce</span>, 
+                            published by <span class="font-bold text-white">extrahotsauce</span>, 
+                            verified by <span class="font-bold text-white">extrahotsauce</span>
                         </p>
-                        <p id="detailDesc" class="text-xs italic text-slate-400 mt-1">"-"</p>
+                        <p id="detailDesc" class="text-xs italic text-slate-400 mt-2">"-"</p>
 
                         <!-- Video Container -->
-                        <div class="mt-4 rounded overflow-hidden aspect-video bg-black relative max-w-2xl mx-auto shadow">
-                            <iframe id="detailIframe" class="w-full h-full" src="https://www.youtube.com/embed/u66qmaYVBW8" title="Level Verification Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="mt-5 rounded-xl overflow-hidden aspect-video bg-slate-950 relative max-w-2xl mx-auto border border-slate-700/50 shadow-2xl">
+                            <iframe id="detailIframe" class="w-full h-full" src="about:blank" title="Level Verification Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
 
                         <!-- Level Metadata Grid -->
-                        <div class="grid grid-cols-2 gap-3 mt-6 pt-4 border-t text-center text-xs justify-center max-w-md mx-auto">
-                            <div>
-                                <div class="text-slate-500 font-medium text-[11px]">Level Password</div>
-                                <div id="detailPassword" class="font-bold text-slate-700 mt-0.5">Free Copy</div>
+                        <div class="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-slate-800 text-center text-xs justify-center max-w-md mx-auto">
+                            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                                <div class="text-slate-400 font-medium text-[11px]">Level Password</div>
+                                <div id="detailPassword" class="font-bold text-sky-400 mt-1">Free Copy</div>
                             </div>
-                            <div>
-                                <div class="text-slate-500 font-medium text-[11px]">Level ID</div>
-                                <div id="detailLevelId" class="font-bold text-slate-700 mt-0.5">144366482</div>
+                            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                                <div class="text-slate-400 font-medium text-[11px]">Level ID</div>
+                                <div id="detailLevelId" class="font-bold text-sky-400 mt-1">144366482</div>
                             </div>
                         </div>
 
-                        <div class="mt-3 text-xs">
-                            <div class="text-slate-500 font-medium text-[11px]">Created In</div>
-                            <div class="font-bold text-slate-700 mt-0.5">2.2</div>
+                        <div class="mt-4 text-xs bg-slate-900/60 p-3 rounded-lg border border-slate-800 max-w-md mx-auto">
+                            <div class="text-slate-400 font-medium text-[11px]">Created In</div>
+                            <div class="font-bold text-slate-200 mt-0.5">2.2</div>
                         </div>
                     </div>
                 </div>
@@ -273,35 +311,35 @@
             <div class="space-y-6">
                 <!-- List Editors Card -->
                 <div class="pc-card p-5 text-center">
-                    <h3 class="font-bold text-slate-700 text-base mb-3">List Editors</h3>
-                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                    <h3 class="font-pusab text-slate-100 text-lg mb-3">List Editors</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
                         Contact any of these people if you have problems with the list or want to see a specific thing changed.
                     </p>
-                    <div class="text-xs font-bold text-slate-600 space-y-2 uppercase tracking-wide">
+                    <div class="text-xs font-bold text-sky-400 space-y-2 uppercase tracking-wide">
                         <div>7r4ject0ry</div>
                     </div>
                 </div>
 
                 <!-- Discord Server Card -->
                 <div class="pc-card p-5 text-center">
-                    <h3 class="font-bold text-slate-700 text-base mb-3 flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-discord text-indigo-500 text-lg"></i> Discord Server
+                    <h3 class="font-pusab text-slate-100 text-lg mb-3 flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-discord text-indigo-400 text-2xl"></i> Discord Server
                     </h3>
-                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
                         Join our Discord community to stay updated, submit records, and chat with other members!
                     </p>
-                    <a href="https://discord.gg/F4JShJA5dt" target="_blank" rel="noopener noreferrer" class="inline-block w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded transition shadow-sm">
+                    <a href="https://discord.gg/F4JShJA5dt" target="_blank" rel="noopener noreferrer" class="inline-block w-full py-2.5 btn-glow text-white font-bold text-xs rounded-lg transition">
                         discord.gg/F4JShJA5dt
                     </a>
                 </div>
 
                 <!-- Guidelines Card -->
                 <div class="pc-card p-5 text-center">
-                    <h3 class="font-bold text-slate-700 text-base mb-3">Guidelines</h3>
-                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-                        All demonlist operations are carried out in accordance to our guidelines. Be sure to check them before submitting a record to ensure a flawless experience!
+                    <h3 class="font-pusab text-slate-100 text-lg mb-3">Guidelines</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        All demonlist operations are carried out in accordance to our guidelines. Be sure to check them before submitting a record!
                     </p>
-                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded transition shadow-sm">
+                    <button class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs rounded-lg transition shadow">
                         Read the guidelines!
                     </button>
                 </div>
@@ -347,8 +385,8 @@
         function showDetailView(levelKey = 'cloudyHaze') {
             const level = levelData[levelKey];
             if (level) {
-                document.getElementById('detailTitle').innerHTML = `${level.title} <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-400 text-xl hover:text-slate-600"></i></a>`;
-                document.getElementById('detailCreators').innerHTML = `by <span class="underline font-medium">${level.creator}</span>, published by <span class="font-bold">${level.publisher}</span>, verified by <span class="font-bold">${level.verifier}</span>`;
+                document.getElementById('detailTitle').innerHTML = `${level.title} <a href="#" onclick="showListView()"><i class="fa-solid fa-chevron-right text-slate-500 text-xl hover:text-white transition"></i></a>`;
+                document.getElementById('detailCreators').innerHTML = `by <span class="underline font-medium text-sky-400">${level.creator}</span>, published by <span class="font-bold text-white">${level.publisher}</span>, verified by <span class="font-bold text-white">${level.verifier}</span>`;
                 document.getElementById('detailDesc').textContent = level.desc;
                 document.getElementById('detailIframe').src = `https://www.youtube.com/embed/${level.videoId}?enablejsapi=1&autoplay=1`;
                 document.getElementById('detailPassword').textContent = level.password;
